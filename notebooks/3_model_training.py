@@ -26,8 +26,18 @@ numeric_transformer = Pipeline(steps=[
 ])
 
 # Define preprocessing for categorical features
-# Update the list to include only existing columns
-categorical_features = ['arrival_time', 'departure_time', 'destination_city', 'source_city', 'airline', 'class']
+categorical_features = [
+    'airline_AirAsia', 'airline_Air_India', 'airline_GO_FIRST', 'airline_Indigo',
+    'airline_SpiceJet', 'airline_Vistara', 'source_city_Bangalore', 'source_city_Chennai',
+    'source_city_Delhi', 'source_city_Hyderabad', 'source_city_Kolkata', 'source_city_Mumbai',
+    'departure_time_Afternoon', 'departure_time_Early_Morning', 'departure_time_Evening',
+    'departure_time_Late_Night', 'departure_time_Morning', 'departure_time_Night',
+    'stops_one', 'stops_two_or_more', 'stops_zero', 'arrival_time_Afternoon',
+    'arrival_time_Early_Morning', 'arrival_time_Evening', 'arrival_time_Late_Night',
+    'arrival_time_Morning', 'arrival_time_Night', 'destination_city_Bangalore',
+    'destination_city_Chennai', 'destination_city_Delhi', 'destination_city_Hyderabad',
+    'destination_city_Kolkata', 'destination_city_Mumbai', 'class_Business', 'class_Economy'
+]
 categorical_transformer = Pipeline(steps=[
     ('onehot', OneHotEncoder(handle_unknown='ignore'))
 ])
@@ -87,6 +97,9 @@ plt.ylabel("预测票价", fontproperties=font_prop)
 # Save the plot as an image file in the figure directory
 plt.savefig('../data/figure/comparison_plot.png')
 plt.show()
+
+# Fit the preprocessor
+preprocessor.fit(X_train)
 
 # Save the trained model and preprocessor
 joblib.dump(best_model.named_steps['regressor'], '../notebooks/flight_price_model.pkl')

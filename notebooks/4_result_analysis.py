@@ -45,7 +45,7 @@ plt.ylabel("系数", fontproperties=font_prop)
 os.makedirs('figure', exist_ok=True)
 
 # Save the plot as an image file in the figure directory
-plt.savefig('figure/comparison_plot.png')
+plt.savefig('../data/figure/comparison_plot.png')
 
 # Show the plot
 plt.show()

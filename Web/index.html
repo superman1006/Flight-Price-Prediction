@@ -521,7 +521,7 @@
         resultSection.style.display = "block";
 
         // Display predicted price
-        document.getElementById("predictedPrice").textContent = `₹${result.price.toLocaleString()}`;
+        document.getElementById("predictedPrice").textContent = `$${result.price.toLocaleString()}`;
       })
       .catch(error => {
         console.error('Error:', error);

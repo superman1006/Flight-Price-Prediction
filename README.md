@@ -105,5 +105,3 @@ pip install -r requirements.txt
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
-
-请按原样复制，确保没有渲染，保持纯文本格式。这应该可以避免任何格式上的自动渲染问题。如果有其他需要，随时告诉我！

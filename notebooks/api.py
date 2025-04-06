@@ -9,8 +9,7 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 import joblib
 import pandas as pd
-import numpy as np
-from datetime import datetime
+
 
 app = Flask(__name__,
             static_folder='../data',  # 设置静态文件夹为data目录

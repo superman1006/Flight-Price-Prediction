@@ -1,107 +1,119 @@
+# Flight Price Prediction
 
-# Flight Price Prediction using Linear Regression
+本项目旨在预测航班价格，帮助消费者找到最佳价格，同时协助航空公司优化收入管理策略。通过分析影响航班价格的关键因素，构建机器学习模型以预测未来价格。
 
-This project aims to predict flight prices using linear regression techniques. The goal is to help consumers find the best prices and assist airlines in optimizing their revenue management strategies. By predicting flight prices, this project explores the key determinants affecting airfare and builds a model to forecast future prices.
+## 目录
 
-## Table of Contents
+- [项目概述](#项目概述)
+- [数据结构](#数据结构)
+- [如何运行代码](#如何运行代码)
+- [项目组织](#项目组织)
+- [依赖项](#依赖项)
+- [参考文献](#参考文献)
 
-- [Project Overview](#project-overview)
-- [Data Structure](#data-structure)
-- [How to Run the Code](#how-to-run-the-code)
-- [Project Organization](#project-organization)
-- [Requirements](#requirements)
-- [References](#references)
+## 项目概述
 
-## Project Overview
+本项目包括以下主要任务：
 
-The project involves the following major tasks:
-1. **Data Collection & Feature Selection**: Identify and evaluate factors such as airline, route distance, flight time, departure and destination cities, and seat class that impact flight costs.
-2. **Model Construction**: Develop a linear regression model to predict flight prices and explore the relationships between various features and the prices.
-3. **Model Evaluation & Optimization**: Evaluate the model using metrics like Mean Squared Error (MSE) and R², and refine it to enhance performance.
-4. **Results Analysis**: Analyze the model’s output to understand the main determinants of flight prices and suggest potential improvements.
+1. **数据预处理**：清洗原始数据，处理缺失值、编码分类变量、缩放数值变量。
+2. **特征选择与工程**：分析影响航班价格的因素，如航空公司、航线距离、出发时间、到达城市和座位等级等，选择相关特征。
+3. **模型训练**：使用 LightGBM 模型训练数据，预测航班价格。
+4. **模型评估与优化**：通过均方误差 (MSE)、平均绝对误差 (MAE) 和 R² 等指标评估模型性能，并进行优化。
+5. **结果分析**：分析模型输出，理解影响航班价格的主要因素，并提出改进建议。
 
+## 如何运行代码
 
+按照以下步骤在本地运行项目：
 
-## How to Run the Code
+1. 克隆代码库：
 
-To run the project locally, follow these steps:
-
-1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/flight-price-prediction.git
    cd flight-price-prediction
    ```
 
-2. Install the required dependencies:
+2. 安装所需依赖项：
+
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Preprocess the data:
-   - Open `notebooks/1_data_preprocessing.ipynb` in Jupyter Notebook.
-   - Run all cells to clean and preprocess the data.
+3. 数据预处理：
+   - 打开 `notebooks/1_data_preprocessing.ipynb`。
+   - 运行所有单元格以清洗和预处理数据。
 
-4. Perform feature selection:
-   - Open `notebooks/2_feature_selection.ipynb`.
-   - Run all cells to select relevant features for the model.
+4. 特征选择：
+   - 打开 `notebooks/2_feature_selection.ipynb`。
+   - 运行所有单元格以选择模型的相关特征。
 
-5. Train the linear regression model:
-   - Open `notebooks/3_model_training.ipynb`.
-   - Run all cells to train the model on the selected features.
+5. 模型训练：
+   - 打开 `notebooks/3_model_training.ipynb`。
+   - 运行所有单元格以训练 LightGBM 模型。
 
-6. Analyze the results:
-   - Open `notebooks/4_result_analysis.ipynb`.
-   - Run all cells to visualize the model’s performance and analyze the impact of different features on flight prices.
+6. 结果分析：
+   - 打开 `notebooks/4_result_analysis.ipynb`。
+   - 运行所有单元格以可视化模型性能并分析特征重要性。
 
-## Project Organization
+## 项目组织
 
 ### `data/`
-- `raw/` contains the original dataset files in CSV format.
-- `processed/` contains the cleaned and preprocessed data after handling missing values, encoding categorical features, and scaling numerical variables.
-- `external/` can contain external data sources, if applicable.
+
+- `raw/`：包含原始数据集文件（CSV 格式）。
+- `processed/`：包含清洗和预处理后的数据。
 
 ### `notebooks/`
-- Jupyter Notebooks for each major phase of the project: data preprocessing, feature selection, model training, and results analysis.
+
+- 包含 Jupyter Notebook 文件：
+  - `1_data_preprocessing.ipynb`：数据清洗与预处理。
+  - `2_feature_selection.ipynb`：特征选择与工程。
+  - `3_model_training.ipynb`：模型训练。
+  - `4_result_analysis.ipynb`：结果分析与可视化。
 
 ### `src/`
-- Python source code files for each module in the project:
-  - `data_preprocessing.py` handles data cleaning and preprocessing.
-  - `feature_engineering.py` performs feature selection and engineering.
-  - `model.py` builds and trains the linear regression model.
-  - `evaluation.py` evaluates the model using performance metrics.
-  - `utils.py` contains utility functions to assist with various tasks.
+
+- 包含 Python 源代码文件：
+  - `data_preprocessing.py`：数据清洗与预处理模块。
+  - `feature_engineering.py`：特征选择与工程模块。
+  - `model.py`：模型构建与训练模块。
+  - `evaluation.py`：模型评估模块。
+  - `utils.py`：辅助函数模块。
 
 ### `reports/`
-- The thesis proposal and final report PDFs, as well as a Bibtex file containing references.
+
+- 包含项目报告和参考文献。
 
 ### `requirements.txt`
-- Lists the necessary Python libraries to run the project. It includes packages like pandas, scikit-learn, numpy, and matplotlib.
+
+- 列出了运行项目所需的 Python 库。
 
 ### `.gitignore`
-- Specifies which files and directories Git should ignore, including data files and other non-source files.
 
-## Requirements
+- 指定 Git 应忽略的文件和目录。
 
-To run the project, you'll need the following Python libraries:
+## 依赖项
+
+运行项目需要以下 Python 库：
+
 - pandas
 - numpy
 - scikit-learn
 - matplotlib
 - seaborn
+- lightgbm
+- jupyter
 
-You can install all the dependencies by running:
+通过以下命令安装所有依赖项：
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## References
+## 参考文献
 
 1. Abdella J A, Zaki N M, Shuaib K, et al. "Airline ticket price and demand prediction: A survey." *Journal of King Saud University-Computer and Information Sciences*, 2021, 33(4): 375-391.
 2. Panigrahi A, Sharma R, Chakravarty S, et al. "Flight Price Prediction Using Machine Learning." *ACI@ ISIC*, 2022: 172-178.
 3. Samunderu E, Farrugia M. "Predicting customer purpose of travel in a low-cost travel environment—A Machine Learning Approach." *Machine Learning with Applications*, 2022, 9: 100379.
-4. He K, Zhang X, Ren S, et al. "Deep residual learning for image recognition." *Proceedings of the IEEE conference on computer vision and pattern recognition*, 2016: 770-778.
 
-## License
+## 许可证
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
+本项目基于 MIT 许可证开源，详情请参阅 [LICENSE](LICENSE) 文件。

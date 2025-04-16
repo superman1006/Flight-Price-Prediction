@@ -1,33 +1,59 @@
+'''
+Author: superman1006 1402788264@qq.com
+Date: 2025-03-31 23:20:18
+LastEditors: superman1006 1402788264@qq.com
+LastEditTime: 2025-04-15 23:00:47
+FilePath: Flight-Price-Prediction\notebooks\1_data_preprocessing.py
+Description: Data preprocessing script for flight price prediction
+'''
 import sys
 import os
-# 将项目根目录添加到Python路径
+# Add project root to Python path to ensure src modules can be imported
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
+# Import data preprocessing module from src directory
 from src.data_preprocessing import preprocess_data
 
 
 if __name__ == "__main__":
-    # 设置数据文件路径
+    """
+    Data Preprocessing Main Program
+    Main functionalities:
+    1. Read the original dataset 'Clean_Dataset.csv'
+    2. Preprocess the data, including:
+       - Handle missing values
+       - Standardize numerical features
+       - Encode categorical features
+       - Feature selection
+    3. Save processed data to processed directory
+    4. Output basic statistical information after processing
+    """
+    
+    # Set data file paths
+    # raw_data_dir: directory for raw data storage
+    # processed_data_dir: directory for processed data storage
     raw_data_dir = os.path.join(project_root, 'data', 'raw')
     processed_data_dir = os.path.join(project_root, 'data', 'processed')
     
-    # 确保输出目录存在
+    # Ensure output directory exists, create if not
     os.makedirs(processed_data_dir, exist_ok=True)
     
-    # 处理Clean_Dataset
+    # Process Clean_Dataset
     clean_file = os.path.join(raw_data_dir, 'Clean_Dataset.csv')
     if os.path.exists(clean_file):
+        # Call preprocessing function to process data
         df_clean = preprocess_data(clean_file)
+        
         if df_clean is not None:
-            # 保存处理后的数据
+            # Save processed data to CSV file
             output_file = os.path.join(processed_data_dir, 'clean_processed_data.csv')
             df_clean.to_csv(output_file, index=False)
-            print(f"\n处理后的数据已保存到: {output_file}")
+            print(f"\nProcessed data saved to: {output_file}")
             
-            # 再次打印价格范围以确认
-            print("\n保存后的价格范围:")
-            print(f"最小价格: {df_clean['price'].min():.2f}")
-            print(f"最大价格: {df_clean['price'].max():.2f}")
-            print(f"平均价格: {df_clean['price'].mean():.2f}")
-            print(f"价格标准差: {df_clean['price'].std():.2f}")
+            # Output price statistics for validation
+            print("\nPrice range after processing:")
+            print(f"Minimum price: {df_clean['price'].min():.2f}")  # Display lowest price
+            print(f"Maximum price: {df_clean['price'].max():.2f}")  # Display highest price
+            print(f"Average price: {df_clean['price'].mean():.2f}")  # Display average price
+            print(f"Price std dev: {df_clean['price'].std():.2f}")  # Display price volatility

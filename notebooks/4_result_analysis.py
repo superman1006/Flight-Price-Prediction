@@ -1,68 +1,133 @@
+'''
+Author: superman1006 1402788264@qq.com
+Date: 2025-03-31 23:20:18
+LastEditors: superman1006 1402788264@qq.com
+LastEditTime: 2025-04-15 23:08:47
+FilePath: Flight-Price-Prediction\notebooks\4_result_analysis.py
+Description: Model result analysis and visualization script
+'''
+
 import sys
 import os
-# 将项目根目录添加到Python路径
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import joblib
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+
+# Add project root to Python path to ensure src modules can be imported
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-import joblib
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.linear_model import LinearRegression
-import matplotlib.font_manager as fm
+# Configure matplotlib font settings
+plt.style.use('seaborn')
 
-# 设置数据文件路径
-processed_data_dir = os.path.join(project_root, 'data', 'processed')
-figure_dir = os.path.join(project_root, 'data', 'figure')
-notebooks_dir = os.path.join(project_root, 'notebooks')
-
-# 确保输出目录存在
-os.makedirs(figure_dir, exist_ok=True)
-
-# Define the file path
-file_path = os.path.join(processed_data_dir, 'clean_processed_data.csv')
-
-# Check if the file exists
-if not os.path.exists(file_path):
-    raise FileNotFoundError(f"The file {file_path} does not exist.")
-
-# Load data and trained model
-df = pd.read_csv(file_path)
-model = LinearRegression()
-
-# Assume the training process is completed and load the model
-X = df.drop(columns=['price'])
-y = df['price']
-model.fit(X, y)
-
-# Get model coefficients
-coefficients = model.coef_
-features = X.columns
-
-# Visualize model coefficients
-coef_df = pd.DataFrame(coefficients, index=features, columns=['Coefficient'])
-coef_df.sort_values(by='Coefficient', ascending=False, inplace=True)
-
-# Set font properties for Chinese characters
-font_path = 'C:/Windows/Fonts/simhei.ttf'  # Path to a font that supports Chinese characters
-font_prop = fm.FontProperties(fname=font_path)
-
-plt.figure(figsize=(15, 12))
-sns.barplot(x=coef_df.index, y=coef_df['Coefficient'])
-plt.title("各特征对票价的影响", fontproperties=font_prop)
-plt.xticks(rotation=45, ha='right', fontproperties=font_prop)  # Rotate and align x-axis labels
-plt.xlabel("特征", fontproperties=font_prop)
-plt.ylabel("系数", fontproperties=font_prop)
-
-# Save the plot as an image file in the figure directory
-plt.savefig(os.path.join(figure_dir, 'feature_importance_plot.png'))
-
-# Show the plot
-plt.show()
-
-# Summary of results
-print("模型系数分析：")
-print(coef_df)
-
-# Save the trained model
-joblib.dump(model, os.path.join(notebooks_dir, 'linear_regression_model.pkl'))
+if __name__ == "__main__":
+    """
+    Result Analysis Main Program
+    Main functionalities:
+    1. Load trained model and test data
+    2. Generate predictions
+    3. Create visualization plots:
+       - Prediction vs Actual comparison scatter plot
+       - Feature importance bar plot
+       - Prediction error distribution histogram
+       - Residuals analysis plot
+    4. Save analysis results and visualization plots
+    """
+    
+    # Set paths
+    processed_data_dir = os.path.join(project_root, 'data', 'processed')
+    models_dir = os.path.join(project_root, 'models')
+    results_dir = os.path.join(project_root, 'results')
+    figures_dir = os.path.join(project_root, 'figures')
+    
+    # Ensure output directories exist
+    os.makedirs(figures_dir, exist_ok=True)
+    
+    # Load model and data
+    print("Loading model and data...")
+    model_file = os.path.join(models_dir, 'lightgbm_model.pkl')
+    data_file = os.path.join(processed_data_dir, 'selected_features_data.csv')
+    
+    if not os.path.exists(model_file) or not os.path.exists(data_file):
+        print("Error: Cannot find required model file or data file")
+        print("Please run 3_model_training.py first")
+        sys.exit(1)
+    
+    # Load model and data
+    model = joblib.load(model_file)
+    data = pd.read_csv(data_file)
+    
+    # Prepare features and target variable
+    X = data.drop('price', axis=1)
+    y_true = data['price']
+    y_pred = model.predict(X)
+    
+    # 1. Create prediction vs actual comparison plot
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_true, y_pred, alpha=0.5)
+    plt.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--', lw=2)
+    plt.xlabel('Actual Price')
+    plt.ylabel('Predicted Price')
+    plt.title('Predicted vs Actual Price Comparison')
+    plt.savefig(os.path.join(figures_dir, 'prediction_comparison.png'))
+    plt.close()
+    
+    # 2. Create feature importance plot
+    feature_importance = pd.DataFrame({
+        'Feature': X.columns,
+        'Importance': model.feature_importances_
+    }).sort_values('Importance', ascending=True)
+    
+    plt.figure(figsize=(10, 6))
+    plt.barh(feature_importance['Feature'], feature_importance['Importance'])
+    plt.xlabel('Feature Importance')
+    plt.title('Feature Importance Ranking')
+    plt.tight_layout()
+    plt.savefig(os.path.join(figures_dir, 'feature_importance.png'))
+    plt.close()
+    
+    # 3. Create prediction error distribution plot
+    errors = y_pred - y_true
+    plt.figure(figsize=(10, 6))
+    plt.hist(errors, bins=50, edgecolor='black')
+    plt.xlabel('Prediction Error')
+    plt.ylabel('Frequency')
+    plt.title('Prediction Error Distribution')
+    plt.savefig(os.path.join(figures_dir, 'error_distribution.png'))
+    plt.close()
+    
+    # 4. Create residuals plot
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_pred, errors, alpha=0.5)
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.xlabel('Predicted Price')
+    plt.ylabel('Residuals')
+    plt.title('Residuals Analysis')
+    plt.savefig(os.path.join(figures_dir, 'residuals.png'))
+    plt.close()
+    
+    # Save analysis results
+    analysis_file = os.path.join(results_dir, 'analysis_results.txt')
+    with open(analysis_file, 'w') as f:
+        f.write("Model Analysis Results Summary:\n\n")
+        f.write("1. Prediction Performance Metrics:\n")
+        f.write(f"   - Mean Squared Error (MSE): {mean_squared_error(y_true, y_pred):.2f}\n")
+        f.write(f"   - Root Mean Squared Error (RMSE): {np.sqrt(mean_squared_error(y_true, y_pred)):.2f}\n")
+        f.write(f"   - Mean Absolute Error (MAE): {mean_absolute_error(y_true, y_pred):.2f}\n")
+        f.write(f"   - R-squared (R²): {r2_score(y_true, y_pred):.4f}\n\n")
+        
+        f.write("2. Feature Importance Ranking:\n")
+        for idx, row in feature_importance.iterrows():
+            f.write(f"   - {row['Feature']}: {row['Importance']:.4f}\n")
+    
+    print("\nAnalysis complete!")
+    print(f"Analysis results saved to: {analysis_file}")
+    print(f"Visualization plots saved to: {figures_dir}")
+    print("\nGenerated plots include:")
+    print("1. prediction_comparison.png - Predicted vs Actual Price Comparison")
+    print("2. feature_importance.png - Feature Importance Plot")
+    print("3. error_distribution.png - Prediction Error Distribution")
+    print("4. residuals.png - Residuals Analysis Plot")

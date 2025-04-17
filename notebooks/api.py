@@ -121,3 +121,4 @@ def predict_price():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    # run the api: python api.py

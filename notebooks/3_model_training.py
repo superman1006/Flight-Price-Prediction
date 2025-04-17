@@ -21,7 +21,8 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
 # Import model training related modules from src directory
-from src.model import train_model, evaluate_model
+from src.model import train_model
+from src.evaluation import evaluate_model
 
 if __name__ == "__main__":
     """
@@ -88,13 +89,13 @@ if __name__ == "__main__":
     
     # Save evaluation results
     results_file = os.path.join(results_dir, 'model_evaluation.txt')
-    with open(results_file, 'w') as f:
+    with open(results_file, 'w', encoding='utf-8') as f:
         f.write("Model Evaluation Results:\n")
         f.write(f"MSE: {eval_results['mse']:.2f}\n")
         f.write(f"RMSE: {eval_results['rmse']:.2f}\n")
         f.write(f"MAE: {eval_results['mae']:.2f}\n")
-        f.write(f"R²: {eval_results['r2']:.4f}\n")
-        f.write(f"\nCross-validation R² scores: {eval_results['cv_scores_mean']:.4f} (±{eval_results['cv_scores_std']:.4f})")
+        f.write(f"R^2: {eval_results['r2']:.4f}\n")
+        f.write(f"\nCross-validation R^2 scores: {eval_results['cv_scores_mean']:.4f} (±{eval_results['cv_scores_std']:.4f})")
     
     print(f"Evaluation results saved to: {results_file}")
     
@@ -103,5 +104,5 @@ if __name__ == "__main__":
     print(f"Mean Squared Error (MSE): {eval_results['mse']:.2f}")
     print(f"Root Mean Squared Error (RMSE): {eval_results['rmse']:.2f}")
     print(f"Mean Absolute Error (MAE): {eval_results['mae']:.2f}")
-    print(f"R²: {eval_results['r2']:.4f}")
-    print(f"Cross-validation R² scores: {eval_results['cv_scores_mean']:.4f} (±{eval_results['cv_scores_std']:.4f})")
+    print(f"R^2: {eval_results['r2']:.4f}")
+    print(f"Cross-validation R^2 scores: {eval_results['cv_scores_mean']:.4f} (±{eval_results['cv_scores_std']:.4f})")

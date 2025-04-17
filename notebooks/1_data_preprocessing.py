@@ -2,12 +2,13 @@
 Author: superman1006 1402788264@qq.com
 Date: 2025-03-31 23:20:18
 LastEditors: superman1006 1402788264@qq.com
-LastEditTime: 2025-04-15 23:00:47
+LastEditTime: 2025-04-17 00:40:00
 FilePath: Flight-Price-Prediction\notebooks\1_data_preprocessing.py
 Description: Data preprocessing script for flight price prediction
 '''
 import sys
 import os
+import pandas as pd
 # Add project root to Python path to ensure src modules can be imported
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
@@ -46,6 +47,22 @@ if __name__ == "__main__":
         df_clean = preprocess_data(clean_file)
         
         if df_clean is not None:
+            
+            # Read original dataset to get feature types
+            raw_df = pd.read_csv(clean_file)
+            categorical_cols = raw_df.select_dtypes(include=['object']).columns
+            numerical_cols = raw_df.select_dtypes(include=['float64', 'int64']).columns
+            
+            # Output categorical and numerical feature names
+            print("\nFeature Type Classification:")
+            print("\nCategorical Features:")
+            for col in categorical_cols:
+                print(f"- {col}")
+                
+            print("\nNumerical Features:")
+            for col in numerical_cols:
+                print(f"- {col}")
+            
             # Save processed data to CSV file
             output_file = os.path.join(processed_data_dir, 'clean_processed_data.csv')
             df_clean.to_csv(output_file, index=False)

@@ -1,0 +1,7 @@
+Model Evaluation Results:
+MSE: 49668977.17
+RMSE: 7047.62
+MAE: 4881.15
+R^2: 0.9027
+
+Cross-validation R^2 scores: 0.9027 (±0.0027)

@@ -6,7 +6,7 @@ import src.utils as utils
 
 def preprocess_data(file_path):
     try:
-        # 这三个数据集的特征不一样，所以需要分类处理
+        # These three datasets have different features, so they need to be processed differently
         if "Clean_Dataset" in file_path:
             df = pd.read_csv(file_path, usecols=['airline', 'flight', 'source_city', 'departure_time',
                                                  'stops', 'arrival_time', 'destination_city', 'class',
@@ -39,48 +39,48 @@ def preprocess_data(file_path):
         print(f"Error reading the file: {e}")
         return None
 
-    # 一.特征分类
+    # I. Feature Classification
     numerical_cols = df.select_dtypes(include=['float64', 'int64']).columns
     categorical_cols = df.select_dtypes(include=['object']).columns
 
     print(f"numerical_cols:{numerical_cols}")
     print(f"categorical_cols:{categorical_cols}")
 
-    # 二.缺失值处理
+    # II. Missing Value Handling
     print('-' * 100)
-    print(f"数据的列:\n{df.columns}")
+    print(f"Data columns:\n{df.columns}")
     print('-' * 100)
-    print(f"缺失值情况:\n{df.isnull().sum()}")
+    print(f"Missing values situation:\n{df.isnull().sum()}")
 
-    # 2.1 数值型缺失
+    # 2.1 Numerical Missing Values
     df[numerical_cols] = df[numerical_cols].fillna(df[numerical_cols].mean())
 
-    # 2.2 类别型缺失
+    # 2.2 Categorical Missing Values
     print('-' * 100)
     for col in categorical_cols:
         mode_value = df[col].mode().iloc[0]
         df[col] = df[col].fillna(mode_value)
 
-    # 三.特征转换
-    # 3.1 数值特征 标准化
+    # III. Feature Transformation
+    # 3.1 Numerical Feature Standardization
     scaler = StandardScaler()
 
-    # 将price从数值特征中排除
+    # Exclude price from numerical features
     numerical_cols_without_price = [col for col in numerical_cols if col != 'price']
 
-    # 只对非价格特征进行标准化
+    # Only standardize non-price features
     if len(numerical_cols_without_price) > 0:
         df[numerical_cols_without_price] = scaler.fit_transform(df[numerical_cols_without_price])
 
-    # 3.2 类别型特征转换为虚拟变量
+    # 3.2 Convert categorical features to dummy variables
     df = pd.get_dummies(df, columns=categorical_cols, drop_first=False)
 
-    # 打印价格范围
-    print("\n价格范围:")
-    print(f"最小价格: {df['price'].min():.2f}")
-    print(f"最大价格: {df['price'].max():.2f}")
-    print(f"平均价格: {df['price'].mean():.2f}")
-    print(f"价格标准差: {df['price'].std():.2f}")
+    # Print price range
+    print("\nPrice Range:")
+    print(f"Minimum price: {df['price'].min():.2f}")
+    print(f"Maximum price: {df['price'].max():.2f}")
+    print(f"Average price: {df['price'].mean():.2f}")
+    print(f"Price std dev: {df['price'].std():.2f}")
 
 
     return df

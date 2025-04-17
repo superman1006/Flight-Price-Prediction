@@ -20,8 +20,9 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-# Configure matplotlib font settings
-plt.style.use('seaborn')
+# Configure matplotlib and seaborn settings
+plt.style.use('ggplot')  # Use ggplot style instead of seaborn
+sns.set()  # Apply seaborn defaults
 
 if __name__ == "__main__":
     """
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     processed_data_dir = os.path.join(project_root, 'data', 'processed')
     models_dir = os.path.join(project_root, 'models')
     results_dir = os.path.join(project_root, 'results')
-    figures_dir = os.path.join(project_root, 'figures')
+    figures_dir = os.path.join(project_root, 'data', 'figure')
     
     # Ensure output directories exist
     os.makedirs(figures_dir, exist_ok=True)
@@ -63,7 +64,25 @@ if __name__ == "__main__":
     # Prepare features and target variable
     X = data.drop('price', axis=1)
     y_true = data['price']
-    y_pred = model.predict(X)
+    
+    # Check if model has feature_importances_ attribute (LightGBM or tree-based models)
+    has_feature_importance = hasattr(model, 'feature_importances_')
+    
+    # Make predictions
+    try:
+        y_pred = model.predict(X)
+    except:
+        # Handle possible format issues for different model types
+        print("Warning: Using alternative prediction method")
+        # Try to handle LightGBM booster vs sklearn model differences
+        if hasattr(model, 'predict'):
+            y_pred = model.predict(X)
+        else:
+            if hasattr(model, 'booster_'):
+                y_pred = model.booster_.predict(X)
+            else:
+                print("Error: Cannot make predictions with this model type")
+                sys.exit(1)
     
     # 1. Create prediction vs actual comparison plot
     plt.figure(figsize=(10, 6))
@@ -75,19 +94,22 @@ if __name__ == "__main__":
     plt.savefig(os.path.join(figures_dir, 'prediction_comparison.png'))
     plt.close()
     
-    # 2. Create feature importance plot
-    feature_importance = pd.DataFrame({
-        'Feature': X.columns,
-        'Importance': model.feature_importances_
-    }).sort_values('Importance', ascending=True)
-    
-    plt.figure(figsize=(10, 6))
-    plt.barh(feature_importance['Feature'], feature_importance['Importance'])
-    plt.xlabel('Feature Importance')
-    plt.title('Feature Importance Ranking')
-    plt.tight_layout()
-    plt.savefig(os.path.join(figures_dir, 'feature_importance.png'))
-    plt.close()
+    # 2. Create feature importance plot if available
+    if has_feature_importance:
+        feature_importance = pd.DataFrame({
+            'Feature': X.columns,
+            'Importance': model.feature_importances_
+        }).sort_values('Importance', ascending=True)
+        
+        plt.figure(figsize=(10, 6))
+        plt.barh(feature_importance['Feature'], feature_importance['Importance'])
+        plt.xlabel('Feature Importance')
+        plt.title('Feature Importance Ranking')
+        plt.tight_layout()
+        plt.savefig(os.path.join(figures_dir, 'feature_importance.png'))
+        plt.close()
+    else:
+        print("Note: Feature importance plot not created (model does not support feature importance)")
     
     # 3. Create prediction error distribution plot
     errors = y_pred - y_true
@@ -111,23 +133,26 @@ if __name__ == "__main__":
     
     # Save analysis results
     analysis_file = os.path.join(results_dir, 'analysis_results.txt')
-    with open(analysis_file, 'w') as f:
+    with open(analysis_file, 'w', encoding='utf-8') as f:
         f.write("Model Analysis Results Summary:\n\n")
         f.write("1. Prediction Performance Metrics:\n")
         f.write(f"   - Mean Squared Error (MSE): {mean_squared_error(y_true, y_pred):.2f}\n")
         f.write(f"   - Root Mean Squared Error (RMSE): {np.sqrt(mean_squared_error(y_true, y_pred)):.2f}\n")
         f.write(f"   - Mean Absolute Error (MAE): {mean_absolute_error(y_true, y_pred):.2f}\n")
-        f.write(f"   - R-squared (R²): {r2_score(y_true, y_pred):.4f}\n\n")
+        f.write(f"   - R-squared (R^2): {r2_score(y_true, y_pred):.4f}\n\n")
         
-        f.write("2. Feature Importance Ranking:\n")
-        for idx, row in feature_importance.iterrows():
-            f.write(f"   - {row['Feature']}: {row['Importance']:.4f}\n")
+        # Write feature importance if available
+        if has_feature_importance:
+            f.write("2. Feature Importance Ranking:\n")
+            for idx, row in feature_importance.iterrows():
+                f.write(f"   - {row['Feature']}: {row['Importance']:.4f}\n")
     
     print("\nAnalysis complete!")
     print(f"Analysis results saved to: {analysis_file}")
     print(f"Visualization plots saved to: {figures_dir}")
     print("\nGenerated plots include:")
     print("1. prediction_comparison.png - Predicted vs Actual Price Comparison")
-    print("2. feature_importance.png - Feature Importance Plot")
+    if has_feature_importance:
+        print("2. feature_importance.png - Feature Importance Plot")
     print("3. error_distribution.png - Prediction Error Distribution")
     print("4. residuals.png - Residuals Analysis Plot")
